@@ -264,6 +264,8 @@ impl AptosDB {
         max_nodes_per_lru_cache_shard: usize,
         hack_for_tests: bool,
     ) -> Self {
+        info!("in new_with_dbs");
+
         let arc_ledger_rocksdb = Arc::new(ledger_rocksdb);
         let arc_state_merkle_rocksdb = Arc::new(state_merkle_rocksdb);
         let state_pruner = StatePrunerManager::new(
@@ -435,6 +437,8 @@ impl AptosDB {
         // Secondary needs `max_open_files = -1` per https://github.com/facebook/rocksdb/wiki/Secondary-instance
         rocksdb_configs.ledger_db_config.max_open_files = -1;
         rocksdb_configs.state_merkle_db_config.max_open_files = -1;
+
+        info!("OPENING DB");
 
         Ok(Self::new_with_dbs(
             DB::open_cf_as_secondary(
