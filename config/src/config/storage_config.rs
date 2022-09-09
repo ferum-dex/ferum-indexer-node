@@ -248,6 +248,14 @@ impl StorageConfig {
         }
     }
 
+    pub fn secondary_dir(&self) -> PathBuf {
+        if self.secondary_dir.is_relative() {
+            self.secondary_dir.join(&self.dir)
+        } else {
+            self.secondary_dir.clone()
+        }
+    }
+
     pub fn set_data_dir(&mut self, data_dir: PathBuf) {
         self.data_dir = data_dir;
     }

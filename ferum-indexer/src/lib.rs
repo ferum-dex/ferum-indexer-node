@@ -149,8 +149,8 @@ pub fn setup_environment(
     let instant = Instant::now();
     let (aptos_db, db_rw) = DbReaderWriter::wrap(
         AptosDB::open_as_secondary(
-            &node_config.storage.dir.as_path(),
-            &node_config.storage.secondary_dir.as_path(),
+            &node_config.storage.dir(),
+            &node_config.storage.secondary_dir(),
             node_config.storage.rocksdb_configs,
         )
         .map_err(|err| anyhow!("DB failed to open {}", err))?,
