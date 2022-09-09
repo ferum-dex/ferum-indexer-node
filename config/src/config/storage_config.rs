@@ -73,6 +73,7 @@ impl Default for RocksdbConfigs {
 pub struct StorageConfig {
     pub backup_service_address: SocketAddr,
     pub dir: PathBuf,
+    pub secondary_dir: PathBuf,
     pub storage_pruner_config: PrunerConfig,
     #[serde(skip)]
     data_dir: PathBuf,

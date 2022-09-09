@@ -3,7 +3,7 @@
 
 #![forbid(unsafe_code)]
 
-use aptos_node::AptosNodeArgs;
+use ferum_indexer::FerumIndexerConfig;
 use clap::Parser;
 
 #[cfg(unix)]
@@ -11,5 +11,5 @@ use clap::Parser;
 static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
 
 fn main() {
-    AptosNodeArgs::parse().run()
+    FerumIndexerConfig::parse().run()
 }

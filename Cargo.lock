@@ -883,20 +883,49 @@ name = "aptos-node"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "aptos-api",
+ "aptos-build-info",
  "aptos-config",
+ "aptos-crypto",
+ "aptos-data-client",
  "aptos-fh-stream",
+ "aptos-genesis",
+ "aptos-infallible",
  "aptos-logger",
+ "aptos-mempool",
+ "aptos-secure-storage",
  "aptos-state-view",
+ "aptos-telemetry",
+ "aptos-temppath",
+ "aptos-time-service",
  "aptos-types",
+ "aptos-vm",
  "aptosdb",
+ "backup-service",
  "bcs",
+ "cached-packages",
  "clap 3.2.17",
+ "consensus",
+ "consensus-notifications",
+ "crash-handler",
+ "data-streaming-service",
+ "event-notifications",
+ "executor",
+ "executor-types",
  "fail 0.5.0",
+ "framework",
  "futures",
  "hex",
+ "inspection-service",
  "jemallocator",
+ "mempool-notifications",
+ "network",
+ "network-builder",
  "rand 0.7.3",
+ "state-sync-driver",
  "storage-interface",
+ "storage-service-client",
+ "storage-service-server",
  "tokio",
  "tokio-stream",
 ]
@@ -3759,6 +3788,29 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7a407cfaa3385c4ae6b23e84623d48c2798d06e3e6a1878f7f59f17b3f86499"
 dependencies = [
  "instant",
+]
+
+[[package]]
+name = "ferum-indexer"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "aptos-config",
+ "aptos-fh-stream",
+ "aptos-logger",
+ "aptos-state-view",
+ "aptos-types",
+ "aptosdb",
+ "bcs",
+ "clap 3.2.17",
+ "fail 0.5.0",
+ "futures",
+ "hex",
+ "jemallocator",
+ "rand 0.7.3",
+ "storage-interface",
+ "tokio",
+ "tokio-stream",
 ]
 
 [[package]]

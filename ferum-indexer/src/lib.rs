@@ -35,13 +35,13 @@ const TELEMETRY_LOG_INGEST_BUFFER_SIZE: usize = 128;
 /// Runs an aptos fullnode or validator
 #[derive(Clone, Debug, Parser)]
 #[clap(name = "Aptos Node", author, version)]
-pub struct AptosNodeArgs {
+pub struct FerumIndexerConfig {
     /// Path to node configuration file (or template for local test mode)
     #[clap(short = 'f', long, parse(from_os_str), required_unless = "test")]
     config: Option<PathBuf>,
 }
 
-impl AptosNodeArgs {
+impl FerumIndexerConfig {
     pub fn run(self) {
         // Get the config file path
         let config_path = self.config.expect("Config is required to launch node");
@@ -148,14 +148,10 @@ pub fn setup_environment(
     // Open the database
     let instant = Instant::now();
     let (aptos_db, db_rw) = DbReaderWriter::wrap(
-        AptosDB::open(
+        AptosDB::open_as_secondary(
             &node_config.storage.dir(),
-            true, /* readonly */
-            node_config.storage.storage_pruner_config,
+            &node_config.storage.secondary_dir(),
             node_config.storage.rocksdb_configs,
-            node_config.storage.enable_indexer,
-            node_config.storage.target_snapshot_size,
-            node_config.storage.max_num_nodes_per_lru_cache_shard,
         )
         .map_err(|err| anyhow!("DB failed to open {}", err))?,
     );

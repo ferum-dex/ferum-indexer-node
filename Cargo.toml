@@ -138,6 +138,7 @@ exclude =[
 # For more, see the "Conditional compilation for tests" section in documentation/coding_guidelines.md.
 default-members = [
     "ferum-indexer",
+    "aptos-node",
     "consensus/safety-rules",
     "crates/aptos",
     "crates/aptos-faucet",
