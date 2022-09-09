@@ -27,6 +27,7 @@ members = [
     "aptos-move/vm-genesis",
     "aptos-move/writeset-transaction-generator",
     "aptos-node",
+    "ferum-indexer",
     "config",
     "config/global-constants",
     "consensus",
@@ -136,7 +137,7 @@ exclude =[
 #
 # For more, see the "Conditional compilation for tests" section in documentation/coding_guidelines.md.
 default-members = [
-    "aptos-node",
+    "ferum-indexer",
     "consensus/safety-rules",
     "crates/aptos",
     "crates/aptos-faucet",

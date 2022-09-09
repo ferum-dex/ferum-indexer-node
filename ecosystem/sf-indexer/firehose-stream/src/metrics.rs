@@ -4,18 +4,26 @@
 use aptos_metrics_core::{register_int_counter, IntCounter};
 use once_cell::sync::Lazy;
 
-pub static TRANSACTIONS_SENT: Lazy<IntCounter> = Lazy::new(|| {
+pub static TRANSACTIONS_PROCESSED: Lazy<IntCounter> = Lazy::new(|| {
     register_int_counter!(
-        "aptos_fh_stream_transactions_sent_count",
-        "Transactions converted and printed out to stdout, picked up by the StreamingFast Firehose indexer",
+        "aptos_ferum_transactions_processed_count",
+        "Blocks processed by Ferum indexer",
     )
     .unwrap()
 });
 
-pub static BLOCKS_SENT: Lazy<IntCounter> = Lazy::new(|| {
+pub static FERUM_EVENTS_SENT: Lazy<IntCounter> = Lazy::new(|| {
     register_int_counter!(
-        "aptos_fh_stream_blocks_sent_count",
-        "Blocks converted and printed out to stdout, picked up by the StreamingFast Firehose indexer",
+        "aptos_ferum_events_sent_count",
+        "Ferum events converted and printed out to stdout, picked up by the StreamingFast Firehose indexer",
+    )
+    .unwrap()
+});
+
+pub static BLOCKS_PROCESSED: Lazy<IntCounter> = Lazy::new(|| {
+    register_int_counter!(
+        "aptos_ferum_blocks_processed_count",
+        "Blocks processed by Ferum indexer",
     )
     .unwrap()
 });

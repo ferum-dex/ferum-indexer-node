@@ -22,6 +22,8 @@ mod error;
 pub use error::*;
 mod execution_config;
 pub use execution_config::*;
+mod ferum_config;
+pub use ferum_config::*;
 mod inspection_service_config;
 pub use inspection_service_config::*;
 mod logger_config;
@@ -34,8 +36,6 @@ mod secure_backend_config;
 pub use secure_backend_config::*;
 mod state_sync_config;
 pub use state_sync_config::*;
-mod firehose_streamer_config;
-pub use firehose_streamer_config::*;
 mod storage_config;
 pub use storage_config::*;
 mod safety_rules_config;
@@ -60,6 +60,8 @@ pub struct DeprecatedConfig {}
 #[serde(deny_unknown_fields)]
 pub struct NodeConfig {
     #[serde(default)]
+    pub ferum: FerumConfig,
+    #[serde(default)]
     pub base: BaseConfig,
     #[serde(default)]
     pub consensus: ConsensusConfig,
@@ -81,8 +83,6 @@ pub struct NodeConfig {
     pub api: ApiConfig,
     #[serde(default)]
     pub state_sync: StateSyncConfig,
-    #[serde(default)]
-    pub firehose_stream: FirehoseStreamerConfig,
     #[serde(default)]
     pub storage: StorageConfig,
     #[serde(default)]
@@ -410,10 +410,10 @@ impl NodeConfig {
     }
 
     fn default_config(serialized: &str, path: &'static str) -> Self {
-        let config = Self::parse(serialized).unwrap_or_else(|e| panic!("Error in {}: {}", path, e));
+        let config = Self::parse(serialized).unwrap_or_else(|e| panic!("Error in {}: {:?}", path, e));
         config
             .validate_network_configs()
-            .unwrap_or_else(|e| panic!("Error in {}: {}", path, e))
+            .unwrap_or_else(|e| panic!("Error in {}: {:?}", path, e))
     }
 
     pub fn default_for_public_full_node() -> Self {
@@ -536,6 +536,6 @@ mod test {
 
         let contents = std::include_str!("test_data/safety_rules.yaml");
         SafetyRulesConfig::parse(contents)
-            .unwrap_or_else(|e| panic!("Error in safety_rules.yaml: {}", e));
+            .unwrap_or_else(|e| panic!("Error in safety_rules.yaml: {:?}", e));
     }
 }

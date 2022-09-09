@@ -2,24 +2,57 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::metrics;
-use aptos_protos::extractor::v1 as extractor;
 
-use crate::convert::convert_transaction;
 use aptos_api::context::Context;
-use aptos_api_types::{AsConverter, Transaction};
+use aptos_api_types::{
+    AsConverter,
+    Transaction,
+    UserTransaction,
+    MoveType,
+    IdentifierWrapper,
+    Address,
+    MoveStructTag,
+    EventKey,
+};
 use aptos_config::config::NodeConfig;
 use aptos_logger::{debug, error, warn};
-use aptos_mempool::MempoolClientSender;
 use aptos_types::chain_id::ChainId;
 use aptos_vm::data_cache::StorageAdapterOwned;
-use extractor::Transaction as TransactionPB;
 use futures::channel::mpsc::channel;
 use prost::Message;
 use std::{convert::TryInto, sync::Arc, time::Duration};
+use std::borrow::Borrow;
+use std::str::FromStr;
+use aptos_protos::ferum::v1::{
+    OrderCreateEvent as FerumOrderCreateEvent,
+    OrderFinalizeEvent as FerumOrderFinalizeEvent,
+    OrderExecutionEvent as FerumOrderExecutionEvent,
+    PriceUpdateEvent as FerumPriceUpdateEvent,
+};
 use storage_interface::state_view::DbStateView;
 use storage_interface::DbReader;
 use tokio::runtime::{Builder, Runtime};
 use tokio::time::sleep;
+use itertools::Itertools;
+
+#[derive(Debug)]
+enum FerumEvent {
+    OrderCreate(FerumOrderCreateEvent),
+    OrderFinalize(FerumOrderFinalizeEvent),
+    OrderExecution(FerumOrderExecutionEvent),
+    PriceUpdate(FerumPriceUpdateEvent),
+}
+impl FerumEvent {
+    fn encode(&self, buf: &mut Vec<u8>) -> Result<(), prost::EncodeError>
+    {
+        match self {
+            Self::OrderCreate(e) => e.encode(buf),
+            Self::OrderFinalize(e) => e.encode(buf),
+            Self::OrderExecution(e) => e.encode(buf),
+            Self::PriceUpdate(e) => e.encode(buf),
+        }
+    }
+}
 
 /// Creates a runtime which creates a thread pool which pushes firehose of block protobuf to SF endpoint
 /// Returns corresponding Tokio runtime
@@ -27,9 +60,8 @@ pub fn bootstrap(
     config: &NodeConfig,
     chain_id: ChainId,
     db: Arc<dyn DbReader>,
-    mp_sender: MempoolClientSender,
 ) -> Option<anyhow::Result<Runtime>> {
-    if !config.firehose_stream.enabled {
+    if !config.ferum.address.is_none() {
         return None;
     }
 
@@ -42,17 +74,15 @@ pub fn bootstrap(
     let node_config = config.clone();
 
     runtime.spawn(async move {
-        let context = Context::new(chain_id, db, mp_sender.clone(), node_config.clone());
+        let (fake_mp_sender, _) = channel(1);
+        let context = Context::new(chain_id, db, fake_mp_sender, node_config.clone());
         let context_arc = Arc::new(context);
-        // Let the env variable take precedence over the config file, (if env is not set it just default to 0)
-        let config_starting_block = node_config.firehose_stream.starting_block.unwrap_or(0);
-        let mut starting_block = std::env::var("STARTING_BLOCK")
-            .map(|v| v.parse::<u64>().unwrap_or(0))
-            .unwrap_or(0);
-        if starting_block == 0 {
-            starting_block = config_starting_block;
-        }
-        let mut streamer = FirehoseStreamer::new(context_arc, starting_block, Some(mp_sender));
+        let starting_block = node_config.ferum.starting_block.unwrap_or(0);
+        let mut streamer = FirehoseStreamer::new(
+            context_arc,
+            starting_block,
+            Address::from(node_config.ferum.address.clone().unwrap()),
+        );
         streamer.start().await;
     });
     Some(Ok(runtime))
@@ -63,15 +93,21 @@ pub struct FirehoseStreamer {
     pub resolver: Arc<StorageAdapterOwned<DbStateView>>,
     pub current_block_height: u64,
     pub current_epoch: u64,
-    // This is only ever used for testing
-    pub mp_sender: MempoolClientSender,
+
+    // So we don't need to recompute each single time.
+    ferum_address: Address,
+    ferum_module_identifier: IdentifierWrapper,
+    ferum_create_event_identifier: IdentifierWrapper,
+    ferum_finalize_event_identifier: IdentifierWrapper,
+    ferum_execution_event_identifier: IdentifierWrapper,
+    ferum_price_event_identifier: IdentifierWrapper,
 }
 
 impl FirehoseStreamer {
     pub fn new(
         context: Arc<Context>,
         starting_block: u64,
-        mp_client_sender: Option<MempoolClientSender>,
+        ferum_address: Address,
     ) -> Self {
         let resolver = Arc::new(context.move_resolver().unwrap());
         let (_block_start_version, _block_last_version, block_event) = context
@@ -84,18 +120,18 @@ impl FirehoseStreamer {
                 )
             });
 
-        // fake mempool client/sender, if we need to, so we can use the same code for both api and fh-streamer
-        let mp_client_sender = mp_client_sender.unwrap_or_else(|| {
-            let (mp_client_sender, _mp_client_events) = channel(1);
-            mp_client_sender
-        });
-
         Self {
             context,
             resolver,
             current_block_height: block_event.height(),
             current_epoch: block_event.epoch(),
-            mp_sender: mp_client_sender,
+
+            ferum_address,
+            ferum_module_identifier: IdentifierWrapper::from_str(&"module").unwrap(),
+            ferum_create_event_identifier: IdentifierWrapper::from_str(&"CreateEvent").unwrap(),
+            ferum_finalize_event_identifier: IdentifierWrapper::from_str(&"FinalizeEvent").unwrap(),
+            ferum_execution_event_identifier: IdentifierWrapper::from_str(&"ExecutionEvent").unwrap(),
+            ferum_price_event_identifier: IdentifierWrapper::from_str(&"PriceUpdate").unwrap(),
         }
     }
 
@@ -111,8 +147,8 @@ impl FirehoseStreamer {
         }
     }
 
-    pub async fn convert_next_block(&mut self) -> Vec<TransactionPB> {
-        let mut result: Vec<TransactionPB> = vec![];
+    async fn convert_next_block(&mut self) -> Vec<FerumEvent> {
+        let mut result: Vec<FerumEvent> = vec![];
 
         let (block_start_version, block_last_version, _) = match self
             .context
@@ -205,9 +241,9 @@ impl FirehoseStreamer {
             let txn = txn.unwrap();
             if !self.validate_transaction_type(curr_version == block_start_version, &txn) {
                 error!(
-                            "Block {} failed validation: first transaction has to be block metadata or genesis",
-                            self.current_block_height
-                        );
+                    "Block {} failed validation: first transaction has to be block metadata or genesis",
+                    self.current_block_height,
+                );
                 sleep(Duration::from_millis(500)).await;
                 return vec![];
             }
@@ -219,11 +255,19 @@ impl FirehoseStreamer {
                 sleep(Duration::from_millis(500)).await;
                 return vec![];
             }
-            let txn_proto =
-                convert_transaction(&txn, self.current_block_height, self.current_epoch);
-            self.print_transaction(&txn_proto);
-            result.push(txn_proto);
+
             curr_version += 1;
+
+            match txn {
+                Transaction::UserTransaction(user_txn) => {
+                    let mut ferum_events = self.get_ferum_events_from_transaction(user_txn.borrow());
+                    self.print_ferum_events(&ferum_events);
+                    result.append(&mut ferum_events);
+                },
+                _ => {},
+            };
+
+            metrics::TRANSACTIONS_PROCESSED.inc();
         }
 
         if curr_version - 1 != block_last_version {
@@ -238,7 +282,7 @@ impl FirehoseStreamer {
         }
 
         println!("\nFIRE BLOCK_END {}", self.current_block_height);
-        metrics::BLOCKS_SENT.inc();
+        metrics::BLOCKS_PROCESSED.inc();
         self.current_block_height += 1;
         result
     }
@@ -252,15 +296,76 @@ impl FirehoseStreamer {
         is_first_txn == is_bm_or_genesis
     }
 
-    fn print_transaction(&self, transaction: &TransactionPB) {
-        let mut buf = vec![];
-        transaction.encode(&mut buf).unwrap_or_else(|_| {
-            panic!(
-                "Could not convert protobuf transaction to bytes '{:?}'",
-                transaction
-            )
-        });
-        println!("\nFIRE TRX {}", base64::encode(buf));
-        metrics::TRANSACTIONS_SENT.inc();
+    fn print_ferum_events(&self, events: &Vec<FerumEvent>) {
+        events.iter().for_each(|e| {
+            let mut buf = vec![];
+            e.encode(&mut buf).unwrap_or_else(|_| {
+                panic!("Could not convert protobuf event to bytes '{:?}'", e)
+            });
+            let typ = match e {
+                FerumEvent::OrderCreate(_) => "CREATE",
+                FerumEvent::OrderExecution(_) => "EXEC",
+                FerumEvent::OrderFinalize(_) => "FIN",
+                FerumEvent::PriceUpdate(_) => "PUPD",
+            };
+            println!("\nFIRE EVENT {} {}", typ, base64::encode(buf));
+            metrics::FERUM_EVENTS_SENT.inc();
+        })
+    }
+
+    fn get_ferum_events_from_transaction(&self, transaction: &UserTransaction) -> Vec<FerumEvent> {
+        transaction.events.iter()
+            .filter_map(|e| {
+                let key = e.key;
+                let data = e.data.clone();
+                let typ = e.typ.clone();
+                match typ {
+                    MoveType::Struct(tag) => self.parse_ferum_event(&key, &tag, data),
+                    _ => None,
+                }
+            })
+            .collect_vec()
+    }
+
+    fn parse_ferum_event(&self, key: &EventKey, tag: &MoveStructTag, data: serde_json::Value) -> Option<FerumEvent> {
+        if !tag.address.eq(&self.ferum_address) || !tag.module.eq(&self.ferum_module_identifier) {
+            return None
+        }
+
+        if tag.name.eq(&self.ferum_create_event_identifier) {
+            match serde_json::from_value::<FerumOrderCreateEvent>(data) {
+                Ok(event) => Some(FerumEvent::OrderCreate(event)),
+                Err(err) => {
+                    error!("Unable to parse ferum order create event. key: {}. err: {:?}", key, err);
+                    None
+                }
+            }
+        } else if tag.name.eq(&self.ferum_finalize_event_identifier) {
+            match serde_json::from_value::<FerumOrderFinalizeEvent>(data) {
+                Ok(event) => Some(FerumEvent::OrderFinalize(event)),
+                Err(err) => {
+                    error!("Unable to parse ferum order finalize event. key: {}. err: {:?}", key, err);
+                    None
+                }
+            }
+        } else if tag.name.eq(&self.ferum_execution_event_identifier) {
+            match serde_json::from_value::<FerumOrderExecutionEvent>(data) {
+                Ok(event) => Some(FerumEvent::OrderExecution(event)),
+                Err(err) => {
+                    error!("Unable to parse ferum order execution event. key: {}. err: {:?}", key, err);
+                    None
+                }
+            }
+        } else if tag.name.eq(&self.ferum_price_event_identifier) {
+            match serde_json::from_value::<FerumPriceUpdateEvent>(data) {
+                Ok(event) => Some(FerumEvent::PriceUpdate(event)),
+                Err(err) => {
+                    error!("Unable to parse ferum price update event. key: {}. err: {:?}", key, err);
+                    None
+                }
+            }
+        } else {
+            None
+        }
     }
 }
