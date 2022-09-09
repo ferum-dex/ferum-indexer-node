@@ -20,12 +20,14 @@ rand = "0.7.3"
 tokio = { version = "1.18.2", features = ["full"] }
 tokio-stream = "0.1.8"
 
+aptos-build-info = { path = "../crates/aptos-build-info" }
 aptos-config = { path = "../config" }
 aptos-fh-stream = { path = "../ecosystem/sf-indexer/firehose-stream" }
 aptos-logger = { path = "../crates/aptos-logger" }
 aptos-state-view = { path = "../storage/state-view" }
 aptos-types = { path = "../types" }
 aptosdb = { path = "../storage/aptosdb" }
+crash-handler = { path = "../crates/crash-handler" }
 storage-interface = { path = "../storage/storage-interface" }
 
 [target.'cfg(unix)'.dependencies]

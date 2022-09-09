@@ -222,6 +222,7 @@ impl Default for StorageConfig {
         StorageConfig {
             backup_service_address: SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 6186),
             dir: PathBuf::from("db"),
+            secondary_dir: PathBuf::from("secondary_db"),
             // The prune window must at least out live a RPC request because its sub requests are
             // to return a consistent view of the DB at exactly same version. Considering a few
             // thousand TPS we are potentially going to achieve, and a few minutes a consistent view
