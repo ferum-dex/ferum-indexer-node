@@ -61,7 +61,7 @@ pub fn bootstrap(
     chain_id: ChainId,
     db: Arc<dyn DbReader>,
 ) -> Option<anyhow::Result<Runtime>> {
-    if !config.ferum.address.is_none() {
+    if config.ferum.address.is_none() {
         return None;
     }
 
@@ -127,7 +127,7 @@ impl FirehoseStreamer {
             current_epoch: block_event.epoch(),
 
             ferum_address,
-            ferum_module_identifier: IdentifierWrapper::from_str(&"module").unwrap(),
+            ferum_module_identifier: IdentifierWrapper::from_str(&"market").unwrap(),
             ferum_create_event_identifier: IdentifierWrapper::from_str(&"CreateEvent").unwrap(),
             ferum_finalize_event_identifier: IdentifierWrapper::from_str(&"FinalizeEvent").unwrap(),
             ferum_execution_event_identifier: IdentifierWrapper::from_str(&"ExecutionEvent").unwrap(),
