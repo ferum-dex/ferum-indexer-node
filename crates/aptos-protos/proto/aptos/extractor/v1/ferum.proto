@@ -4,19 +4,17 @@ package aptos.ferum.v1;
 
 option go_package = "github.com/ferum-dex/ferum/types/pb/aptos/ferum/v1;pbferum";
 
-import "aptos/util/timestamp/timestamp.proto";
-
 message OrderCreateEvent {
   OrderID orderID = 1;
   OrderMetadata orderMetadata = 2;
-  aptos.util.timestamp.Timestamp timestampMicroSeconds = 3;
+  uint64 timestampMicroSeconds = 3;
 }
 
 message OrderFinalizeEvent {
   OrderID orderID = 1;
   OrderMetadata orderMetadata = 2;
   CancelAgent cancelAgent = 3;
-  aptos.util.timestamp.Timestamp timestampMicroSeconds = 4;
+  uint64 timestampMicroSeconds = 4;
 }
 
 message OrderExecutionEvent {
@@ -29,7 +27,7 @@ message OrderExecutionEvent {
   FixedPoint64 price = 5;
   FixedPoint64 qty = 6;
 
-  aptos.util.timestamp.Timestamp timestampMicroSeconds = 7;
+  uint64 timestampMicroSeconds = 7;
 }
 
 message PriceUpdateEvent {
@@ -62,13 +60,13 @@ message Quote {
   FixedPoint64 bidSize = 4;
   FixedPoint64 minAsk = 5;
   FixedPoint64 askSize = 6;
-  aptos.util.timestamp.Timestamp timestampMicroSeconds = 7;
+  uint64 timestampMicroSeconds = 7;
 }
 
 message TypeInfo {
-  string account_address = 1;
-  string module_name = 2;
-  string struct_name = 3;
+  string account_address = 1 [json_name = "account_address"];
+  string module_name = 2 [json_name = "module_name"];
+  string struct_name = 3 [json_name = "struct_name"];
 }
 
 message FixedPoint64 {
@@ -84,7 +82,7 @@ enum OrderSide {
 enum OrderType {
   OrderTypeNone = 0;
   OrderTypeMarket = 1;
-  OrderTypelimit = 2;
+  OrderTypeLimit = 2;
 }
 
 enum OrderStatus {

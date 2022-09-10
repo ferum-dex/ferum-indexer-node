@@ -16,6 +16,9 @@ use aptos_protos::util::timestamp;
 use hex;
 use move_deps::move_binary_format::file_format::Ability;
 use std::time::Duration;
+use anyhow::anyhow;
+use aptos_protos::ferum::v1::TypeInfo;
+use crate::runtime::FerumEvent;
 
 pub fn convert_move_module_id(move_module_id: &MoveModuleId) -> extractor::MoveModuleId {
     extractor::MoveModuleId {
@@ -447,6 +450,75 @@ pub fn convert_event(event: &Event) -> extractor::Event {
         type_str: event.typ.to_string(),
         data: event.data.to_string(),
     }
+}
+
+pub fn convert_ferum_event(evt: &FerumEvent) -> anyhow::Result<FerumEvent> {
+    let inner = (|| match evt {
+        FerumEvent::OrderCreate(evt) => {
+            let metadata = evt.order_metadata.as_ref()?;
+            let instrument_type = metadata.instrument_type.as_ref()?;
+            let quote_type = metadata.quote_type.as_ref()?;
+
+            let cpy = &mut evt.clone();
+            cpy.order_metadata.as_mut()?.instrument_type = convert_type_info(instrument_type).ok();
+            cpy.order_metadata.as_mut()?.quote_type = convert_type_info(quote_type).ok();
+
+            Some(FerumEvent::OrderCreate(cpy.clone()))
+        }
+        FerumEvent::OrderExecution(evt) => {
+            let metadata = evt.order_metadata.as_ref()?;
+            let instrument_type = metadata.instrument_type.as_ref()?;
+            let quote_type = metadata.quote_type.as_ref()?;
+
+            let cpy = &mut evt.clone();
+            cpy.order_metadata.as_mut()?.instrument_type = convert_type_info(instrument_type).ok();
+            cpy.order_metadata.as_mut()?.quote_type = convert_type_info(quote_type).ok();
+
+            Some(FerumEvent::OrderExecution(cpy.clone()))
+        }
+        FerumEvent::OrderFinalize(evt) => {
+            let metadata = evt.order_metadata.as_ref()?;
+            let instrument_type = metadata.instrument_type.as_ref()?;
+            let quote_type = metadata.quote_type.as_ref()?;
+
+            let cpy = &mut evt.clone();
+            cpy.order_metadata.as_mut()?.instrument_type = convert_type_info(instrument_type).ok();
+            cpy.order_metadata.as_mut()?.quote_type = convert_type_info(quote_type).ok();
+
+            Some(FerumEvent::OrderFinalize(cpy.clone()))
+        }
+        FerumEvent::PriceUpdate(evt) => {
+            let quote = evt.quote.as_ref()?;
+            let instrument_type = quote.instrument_type.as_ref()?;
+            let quote_type = quote.quote_type.as_ref()?;
+
+            let cpy = &mut evt.clone();
+            cpy.quote.as_mut()?.instrument_type = convert_type_info(instrument_type).ok();
+            cpy.quote.as_mut()?.quote_type = convert_type_info(quote_type).ok();
+
+            Some(FerumEvent::PriceUpdate(cpy.clone()))
+        }
+    })();
+
+    inner.ok_or(anyhow!("error"))
+}
+
+/// Decodes the module_name and name of the type info object.
+pub fn convert_type_info(type_info: &TypeInfo) -> anyhow::Result<TypeInfo> {
+    let mut out = type_info.clone();
+    out.module_name = convert_hex_string(out.module_name.to_string())?;
+    out.struct_name = convert_hex_string(out.struct_name.to_string())?;
+    Ok(out)
+}
+
+pub fn convert_hex_string(mut s: String) -> anyhow::Result<String> {
+    if s.len() >= 2 && s[..2].eq("0x") {
+        s = s[2..].to_string();
+    }
+
+    let decoded = hex::decode(&s)?;
+    let inner = String::from_utf8(decoded)?;
+    Ok(inner)
 }
 
 pub fn convert_timestamp_secs(timestamp: u64) -> timestamp::Timestamp {

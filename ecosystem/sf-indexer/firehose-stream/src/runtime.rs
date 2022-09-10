@@ -36,7 +36,7 @@ use tokio::time::sleep;
 use itertools::Itertools;
 
 #[derive(Debug)]
-enum FerumEvent {
+pub enum FerumEvent {
     OrderCreate(FerumOrderCreateEvent),
     OrderFinalize(FerumOrderFinalizeEvent),
     OrderExecution(FerumOrderExecutionEvent),
@@ -147,7 +147,7 @@ impl FirehoseStreamer {
         }
     }
 
-    async fn convert_next_block(&mut self) -> Vec<FerumEvent> {
+    pub async fn convert_next_block(&mut self) -> Vec<FerumEvent> {
         let mut result: Vec<FerumEvent> = vec![];
 
         let (block_start_version, block_last_version, _) = match self
@@ -367,5 +367,95 @@ impl FirehoseStreamer {
         } else {
             None
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use aptos_protos::ferum::v1::{OrderCreateEvent, TypeInfo};
+    use crate::convert::{convert_type_info, convert_hex_string, convert_ferum_event};
+    use crate::runtime::FerumEvent;
+
+    #[test]
+    fn test_convert_hex() {
+        assert_eq!("test_coins", convert_hex_string("0x746573745f636f696e73".to_string()).unwrap());
+        assert!(convert_hex_string("0x1".to_string()).is_err());
+        assert!(convert_hex_string("1".to_string()).is_err());
+        assert_eq!("test_coins", convert_hex_string("746573745f636f696e73".to_string()).unwrap());
+        assert_eq!("t", convert_hex_string("0x74".to_string()).unwrap());
+        assert_eq!("t", convert_hex_string("74".to_string()).unwrap());
+        assert_eq!("", convert_hex_string("".to_string()).unwrap());
+        assert_eq!("", convert_hex_string("0x".to_string()).unwrap());
+    }
+
+    #[test]
+    fn test_convert_type_info() {
+        let info = TypeInfo {
+            account_address: "0x33a6417b3846f094782adb6de9c0f6256c70502bf85e483d53140be0ff87a6fd".to_string(),
+            module_name: "0x746573745f636f696e73".to_string(),
+            struct_name: "0x46616b654d6f6e657942".to_string(),
+        };
+
+        let expected_info = TypeInfo {
+            account_address: "0x33a6417b3846f094782adb6de9c0f6256c70502bf85e483d53140be0ff87a6fd".to_string(),
+            module_name: "test_coins".to_string(),
+            struct_name: "FakeMoneyB".to_string(),
+        };
+
+        assert_eq!(expected_info, convert_type_info(&info).unwrap());
+    }
+
+    #[test]
+    fn test_deserialize_create_event() {
+        let data = r#"
+            {
+              "orderID": {
+                "counter": "0",
+                "owner": "0x33a6417b3846f094782adb6de9c0f6256c70502bf85e483d53140be0ff87a6fd"
+              },
+              "orderMetadata": {
+                "clientOrderID": "",
+                "instrumentType": {
+                  "account_address": "0x33a6417b3846f094782adb6de9c0f6256c70502bf85e483d53140be0ff87a6fd",
+                  "module_name": "0x746573745f636f696e73",
+                  "struct_name": "0x46616b654d6f6e657941"
+                },
+                "originalQty": {
+                  "val": "10000000000"
+                },
+                "price": {
+                  "val": "20000000000"
+                },
+                "quoteType": {
+                  "account_address": "0x33a6417b3846f094782adb6de9c0f6256c70502bf85e483d53140be0ff87a6fd",
+                  "module_name": "0x746573745f636f696e73",
+                  "struct_name": "0x46616b654d6f6e657942"
+                },
+                "remainingQty": {
+                  "val": "10000000000"
+                },
+                "side": 1,
+                "status": 1,
+                "type": 2
+              },
+              "timestampMicroSeconds": "1662710248328332"
+            }
+        "#;
+
+        let evnt: OrderCreateEvent = serde_json::from_str(data).unwrap();
+        let out = convert_ferum_event(&FerumEvent::OrderCreate(evnt)).unwrap();
+        let converted_create_evt = match out {
+           FerumEvent::OrderCreate(evt) => Some(evt),
+           _ => None,
+        }.unwrap();
+        assert_eq!(
+            "test_coins",
+            converted_create_evt.
+                order_metadata.unwrap().
+                instrument_type.unwrap().
+                module_name,
+        );
+
+        return
     }
 }

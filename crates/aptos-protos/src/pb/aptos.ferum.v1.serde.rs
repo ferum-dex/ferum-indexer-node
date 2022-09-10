@@ -182,7 +182,7 @@ impl serde::Serialize for OrderCreateEvent {
         if self.order_metadata.is_some() {
             len += 1;
         }
-        if self.timestamp_micro_seconds.is_some() {
+        if self.timestamp_micro_seconds != 0 {
             len += 1;
         }
         let mut struct_ser = serializer.serialize_struct("aptos.ferum.v1.OrderCreateEvent", len)?;
@@ -192,8 +192,8 @@ impl serde::Serialize for OrderCreateEvent {
         if let Some(v) = self.order_metadata.as_ref() {
             struct_ser.serialize_field("orderMetadata", v)?;
         }
-        if let Some(v) = self.timestamp_micro_seconds.as_ref() {
-            struct_ser.serialize_field("timestampMicroSeconds", v)?;
+        if self.timestamp_micro_seconds != 0 {
+            struct_ser.serialize_field("timestampMicroSeconds", ToString::to_string(&self.timestamp_micro_seconds).as_str())?;
         }
         struct_ser.end()
     }
@@ -279,14 +279,16 @@ impl<'de> serde::Deserialize<'de> for OrderCreateEvent {
                             if timestamp_micro_seconds__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("timestampMicroSeconds"));
                             }
-                            timestamp_micro_seconds__ = Some(map.next_value()?);
+                            timestamp_micro_seconds__ = Some(
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
+                            );
                         }
                     }
                 }
                 Ok(OrderCreateEvent {
                     order_id: order_id__,
                     order_metadata: order_metadata__,
-                    timestamp_micro_seconds: timestamp_micro_seconds__,
+                    timestamp_micro_seconds: timestamp_micro_seconds__.unwrap_or_default(),
                 })
             }
         }
@@ -319,7 +321,7 @@ impl serde::Serialize for OrderExecutionEvent {
         if self.qty.is_some() {
             len += 1;
         }
-        if self.timestamp_micro_seconds.is_some() {
+        if self.timestamp_micro_seconds != 0 {
             len += 1;
         }
         let mut struct_ser = serializer.serialize_struct("aptos.ferum.v1.OrderExecutionEvent", len)?;
@@ -341,8 +343,8 @@ impl serde::Serialize for OrderExecutionEvent {
         if let Some(v) = self.qty.as_ref() {
             struct_ser.serialize_field("qty", v)?;
         }
-        if let Some(v) = self.timestamp_micro_seconds.as_ref() {
-            struct_ser.serialize_field("timestampMicroSeconds", v)?;
+        if self.timestamp_micro_seconds != 0 {
+            struct_ser.serialize_field("timestampMicroSeconds", ToString::to_string(&self.timestamp_micro_seconds).as_str())?;
         }
         struct_ser.end()
     }
@@ -468,7 +470,9 @@ impl<'de> serde::Deserialize<'de> for OrderExecutionEvent {
                             if timestamp_micro_seconds__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("timestampMicroSeconds"));
                             }
-                            timestamp_micro_seconds__ = Some(map.next_value()?);
+                            timestamp_micro_seconds__ = Some(
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
+                            );
                         }
                     }
                 }
@@ -479,7 +483,7 @@ impl<'de> serde::Deserialize<'de> for OrderExecutionEvent {
                     opposite_order_metadata: opposite_order_metadata__,
                     price: price__,
                     qty: qty__,
-                    timestamp_micro_seconds: timestamp_micro_seconds__,
+                    timestamp_micro_seconds: timestamp_micro_seconds__.unwrap_or_default(),
                 })
             }
         }
@@ -503,7 +507,7 @@ impl serde::Serialize for OrderFinalizeEvent {
         if self.cancel_agent != 0 {
             len += 1;
         }
-        if self.timestamp_micro_seconds.is_some() {
+        if self.timestamp_micro_seconds != 0 {
             len += 1;
         }
         let mut struct_ser = serializer.serialize_struct("aptos.ferum.v1.OrderFinalizeEvent", len)?;
@@ -518,8 +522,8 @@ impl serde::Serialize for OrderFinalizeEvent {
                 .ok_or_else(|| serde::ser::Error::custom(format!("Invalid variant {}", self.cancel_agent)))?;
             struct_ser.serialize_field("cancelAgent", &v)?;
         }
-        if let Some(v) = self.timestamp_micro_seconds.as_ref() {
-            struct_ser.serialize_field("timestampMicroSeconds", v)?;
+        if self.timestamp_micro_seconds != 0 {
+            struct_ser.serialize_field("timestampMicroSeconds", ToString::to_string(&self.timestamp_micro_seconds).as_str())?;
         }
         struct_ser.end()
     }
@@ -615,7 +619,9 @@ impl<'de> serde::Deserialize<'de> for OrderFinalizeEvent {
                             if timestamp_micro_seconds__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("timestampMicroSeconds"));
                             }
-                            timestamp_micro_seconds__ = Some(map.next_value()?);
+                            timestamp_micro_seconds__ = Some(
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
+                            );
                         }
                     }
                 }
@@ -623,7 +629,7 @@ impl<'de> serde::Deserialize<'de> for OrderFinalizeEvent {
                     order_id: order_id__,
                     order_metadata: order_metadata__,
                     cancel_agent: cancel_agent__.unwrap_or_default(),
-                    timestamp_micro_seconds: timestamp_micro_seconds__,
+                    timestamp_micro_seconds: timestamp_micro_seconds__.unwrap_or_default(),
                 })
             }
         }
@@ -1140,7 +1146,7 @@ impl serde::Serialize for OrderType {
         let variant = match self {
             Self::None => "OrderTypeNone",
             Self::Market => "OrderTypeMarket",
-            Self::OrderTypelimit => "OrderTypelimit",
+            Self::Limit => "OrderTypeLimit",
         };
         serializer.serialize_str(variant)
     }
@@ -1154,7 +1160,7 @@ impl<'de> serde::Deserialize<'de> for OrderType {
         const FIELDS: &[&str] = &[
             "OrderTypeNone",
             "OrderTypeMarket",
-            "OrderTypelimit",
+            "OrderTypeLimit",
         ];
 
         struct GeneratedVisitor;
@@ -1199,7 +1205,7 @@ impl<'de> serde::Deserialize<'de> for OrderType {
                 match value {
                     "OrderTypeNone" => Ok(OrderType::None),
                     "OrderTypeMarket" => Ok(OrderType::Market),
-                    "OrderTypelimit" => Ok(OrderType::OrderTypelimit),
+                    "OrderTypeLimit" => Ok(OrderType::Limit),
                     _ => Err(serde::de::Error::unknown_variant(value, FIELDS)),
                 }
             }
@@ -1324,7 +1330,7 @@ impl serde::Serialize for Quote {
         if self.ask_size.is_some() {
             len += 1;
         }
-        if self.timestamp_micro_seconds.is_some() {
+        if self.timestamp_micro_seconds != 0 {
             len += 1;
         }
         let mut struct_ser = serializer.serialize_struct("aptos.ferum.v1.Quote", len)?;
@@ -1346,8 +1352,8 @@ impl serde::Serialize for Quote {
         if let Some(v) = self.ask_size.as_ref() {
             struct_ser.serialize_field("askSize", v)?;
         }
-        if let Some(v) = self.timestamp_micro_seconds.as_ref() {
-            struct_ser.serialize_field("timestampMicroSeconds", v)?;
+        if self.timestamp_micro_seconds != 0 {
+            struct_ser.serialize_field("timestampMicroSeconds", ToString::to_string(&self.timestamp_micro_seconds).as_str())?;
         }
         struct_ser.end()
     }
@@ -1473,7 +1479,9 @@ impl<'de> serde::Deserialize<'de> for Quote {
                             if timestamp_micro_seconds__.is_some() {
                                 return Err(serde::de::Error::duplicate_field("timestampMicroSeconds"));
                             }
-                            timestamp_micro_seconds__ = Some(map.next_value()?);
+                            timestamp_micro_seconds__ = Some(
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
+                            );
                         }
                     }
                 }
@@ -1484,7 +1492,7 @@ impl<'de> serde::Deserialize<'de> for Quote {
                     bid_size: bid_size__,
                     min_ask: min_ask__,
                     ask_size: ask_size__,
-                    timestamp_micro_seconds: timestamp_micro_seconds__,
+                    timestamp_micro_seconds: timestamp_micro_seconds__.unwrap_or_default(),
                 })
             }
         }
@@ -1510,13 +1518,13 @@ impl serde::Serialize for TypeInfo {
         }
         let mut struct_ser = serializer.serialize_struct("aptos.ferum.v1.TypeInfo", len)?;
         if !self.account_address.is_empty() {
-            struct_ser.serialize_field("accountAddress", &self.account_address)?;
+            struct_ser.serialize_field("account_address", &self.account_address)?;
         }
         if !self.module_name.is_empty() {
-            struct_ser.serialize_field("moduleName", &self.module_name)?;
+            struct_ser.serialize_field("module_name", &self.module_name)?;
         }
         if !self.struct_name.is_empty() {
-            struct_ser.serialize_field("structName", &self.struct_name)?;
+            struct_ser.serialize_field("struct_name", &self.struct_name)?;
         }
         struct_ser.end()
     }
@@ -1528,9 +1536,9 @@ impl<'de> serde::Deserialize<'de> for TypeInfo {
         D: serde::Deserializer<'de>,
     {
         const FIELDS: &[&str] = &[
-            "accountAddress",
-            "moduleName",
-            "structName",
+            "account_address",
+            "module_name",
+            "struct_name",
         ];
 
         #[allow(clippy::enum_variant_names)]
@@ -1559,9 +1567,9 @@ impl<'de> serde::Deserialize<'de> for TypeInfo {
                         E: serde::de::Error,
                     {
                         match value {
-                            "accountAddress" => Ok(GeneratedField::AccountAddress),
-                            "moduleName" => Ok(GeneratedField::ModuleName),
-                            "structName" => Ok(GeneratedField::StructName),
+                            "account_address" => Ok(GeneratedField::AccountAddress),
+                            "module_name" => Ok(GeneratedField::ModuleName),
+                            "struct_name" => Ok(GeneratedField::StructName),
                             _ => Err(serde::de::Error::unknown_field(value, FIELDS)),
                         }
                     }
@@ -1588,19 +1596,19 @@ impl<'de> serde::Deserialize<'de> for TypeInfo {
                     match k {
                         GeneratedField::AccountAddress => {
                             if account_address__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("accountAddress"));
+                                return Err(serde::de::Error::duplicate_field("account_address"));
                             }
                             account_address__ = Some(map.next_value()?);
                         }
                         GeneratedField::ModuleName => {
                             if module_name__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("moduleName"));
+                                return Err(serde::de::Error::duplicate_field("module_name"));
                             }
                             module_name__ = Some(map.next_value()?);
                         }
                         GeneratedField::StructName => {
                             if struct_name__.is_some() {
-                                return Err(serde::de::Error::duplicate_field("structName"));
+                                return Err(serde::de::Error::duplicate_field("struct_name"));
                             }
                             struct_name__ = Some(map.next_value()?);
                         }
