@@ -332,35 +332,38 @@ impl FirehoseStreamer {
             return None
         }
 
+        // TOOD: need to convert to a string first because there is a bug with trying to parse a serde Value directly.
+        // Bug stems from u64 ints being treated as numbers and strings.
+
         if tag.name.eq(&self.ferum_create_event_identifier) {
-            match serde_json::from_value::<FerumOrderCreateEvent>(data) {
+            match serde_json::from_str::<FerumOrderCreateEvent>(data.clone().to_string().as_str()) {
                 Ok(event) => Some(FerumEvent::OrderCreate(event)),
                 Err(err) => {
-                    error!("Unable to parse ferum order create event. key: {}. err: {:?}", key, err);
+                    error!("Unable to parse ferum order create event. key: {}. data: {}. err: {:?}", key, data, err);
                     None
                 }
             }
         } else if tag.name.eq(&self.ferum_finalize_event_identifier) {
-            match serde_json::from_value::<FerumOrderFinalizeEvent>(data) {
+            match serde_json::from_str::<FerumOrderFinalizeEvent>(data.clone().to_string().as_str()) {
                 Ok(event) => Some(FerumEvent::OrderFinalize(event)),
                 Err(err) => {
-                    error!("Unable to parse ferum order finalize event. key: {}. err: {:?}", key, err);
+                    error!("Unable to parse ferum order finalize event. key: {}. data: {}. err: {:?}", key, data, err);
                     None
                 }
             }
         } else if tag.name.eq(&self.ferum_execution_event_identifier) {
-            match serde_json::from_value::<FerumOrderExecutionEvent>(data) {
+            match serde_json::from_str::<FerumOrderExecutionEvent>(data.clone().to_string().as_str()) {
                 Ok(event) => Some(FerumEvent::OrderExecution(event)),
                 Err(err) => {
-                    error!("Unable to parse ferum order execution event. key: {}. err: {:?}", key, err);
+                    error!("Unable to parse ferum order execution event. key: {}. data: {}. err: {:?}", key, data, err);
                     None
                 }
             }
         } else if tag.name.eq(&self.ferum_price_event_identifier) {
-            match serde_json::from_value::<FerumPriceUpdateEvent>(data) {
+            match serde_json::from_str::<FerumPriceUpdateEvent>(data.clone().to_string().as_str()) {
                 Ok(event) => Some(FerumEvent::PriceUpdate(event)),
                 Err(err) => {
-                    error!("Unable to parse ferum price update event. key: {}. err: {:?}", key, err);
+                    error!("Unable to parse ferum price update event. key: {}. data: {}. err: {:?}", key, data, err);
                     None
                 }
             }
