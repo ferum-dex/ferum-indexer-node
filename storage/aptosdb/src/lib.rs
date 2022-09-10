@@ -437,9 +437,7 @@ impl AptosDB {
         // Secondary needs `max_open_files = -1` per https://github.com/facebook/rocksdb/wiki/Secondary-instance
         rocksdb_configs.ledger_db_config.max_open_files = -1;
         rocksdb_configs.state_merkle_db_config.max_open_files = -1;
-
-        info!("OPENING DB");
-
+        
         Ok(Self::new_with_dbs(
             DB::open_cf_as_secondary(
                 &gen_rocksdb_options(&rocksdb_configs.ledger_db_config, false),
