@@ -26,8 +26,8 @@ aptos-build-info = { path = "../crates/aptos-build-info" }
 aptos-config = { path = "../config" }
 aptos-crypto = { path = "../crates/aptos-crypto" }
 aptos-data-client = { path = "../state-sync/aptos-data-client" }
-aptos-fh-stream = { path = "../ecosystem/sf-indexer/firehose-stream" }
-aptos-genesis = { path = "../crates/aptos-genesis", features = ["testing"] }
+aptos-ferum-stream = { path = "../ecosystem/ferum-stream" }
+aptos-genesis = { path = "../crates/aptos-genesis" }
 aptos-indexer = { path = "../crates/indexer", optional = true }
 aptos-infallible = { path = "../crates/aptos-infallible" }
 aptos-logger = { path = "../crates/aptos-logger" }

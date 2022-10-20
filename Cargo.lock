@@ -504,7 +504,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "aptos-fh-stream"
+name = "aptos-ferum-stream"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -525,15 +525,14 @@ dependencies = [
  "futures",
  "hex",
  "hyper",
- "move-binary-format",
- "move-core-types",
- "move-package",
+ "itertools",
  "once_cell",
  "prost 0.10.4",
  "serde 1.0.144",
  "serde_json",
  "storage-interface",
  "tokio",
+ "warp",
 ]
 
 [[package]]
@@ -860,7 +859,7 @@ dependencies = [
  "aptos-config",
  "aptos-crypto",
  "aptos-data-client",
- "aptos-fh-stream",
+ "aptos-ferum-stream",
  "aptos-genesis",
  "aptos-indexer",
  "aptos-infallible",
