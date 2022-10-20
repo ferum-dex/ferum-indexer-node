@@ -22,6 +22,8 @@ mod error;
 pub use error::*;
 mod execution_config;
 pub use execution_config::*;
+mod ferum_config;
+pub use ferum_config::*;
 mod inspection_service_config;
 pub use inspection_service_config::*;
 mod logger_config;
@@ -61,6 +63,8 @@ pub struct DeprecatedConfig {}
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct NodeConfig {
+    #[serde(default)]
+    pub ferum: FerumConfig,
     #[serde(default)]
     pub base: BaseConfig,
     #[serde(default)]
@@ -478,12 +482,12 @@ impl NodeConfig {
     }
 
     fn default_config(serialized: &str, path: &'static str) -> Self {
-        let config = Self::parse(serialized).unwrap_or_else(|e| panic!("Error in {}: {}", path, e));
+        let config = Self::parse(serialized).unwrap_or_else(|e| panic!("Error in {}: {:?}", path, e));
         config
             .validate_indexer_configs()
             .unwrap_or_else(|e| panic!("Error in {}: {}", path, e))
             .validate_network_configs()
-            .unwrap_or_else(|e| panic!("Error in {}: {}", path, e))
+            .unwrap_or_else(|e| panic!("Error in {}: {:?}", path, e))
     }
 
     pub fn default_for_public_full_node() -> Self {
@@ -606,6 +610,6 @@ mod test {
 
         let contents = std::include_str!("test_data/safety_rules.yaml");
         SafetyRulesConfig::parse(contents)
-            .unwrap_or_else(|e| panic!("Error in safety_rules.yaml: {}", e));
+            .unwrap_or_else(|e| panic!("Error in safety_rules.yaml: {:?}", e));
     }
 }

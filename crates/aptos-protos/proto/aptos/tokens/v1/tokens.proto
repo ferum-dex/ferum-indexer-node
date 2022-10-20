@@ -3,8 +3,9 @@
 
 syntax = "proto3";
 
-package aptos.tokens.v1;
+option go_package = "github.com/aptos/types/pb/aptos/tokens/v1;pbtokens";
 
+package aptos.tokens.v1;
 
 message Tokens {
   uint64 block_height = 1;

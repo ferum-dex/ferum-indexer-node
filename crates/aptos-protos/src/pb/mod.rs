@@ -1,6 +1,3 @@
-// Copyright (c) Aptos
-// SPDX-License-Identifier: Apache-2.0
-
 // @generated
 pub mod aptos {
     pub mod block_output {
@@ -15,6 +12,13 @@ pub mod aptos {
         pub mod v1 {
             include!("aptos.extractor.v1.rs");
             // @@protoc_insertion_point(aptos.extractor.v1)
+        }
+    }
+    pub mod ferum {
+        // @@protoc_insertion_point(attribute:aptos.ferum.v1)
+        pub mod v1 {
+            include!("aptos.ferum.v1.rs");
+            // @@protoc_insertion_point(aptos.ferum.v1)
         }
     }
     pub mod tokens {
