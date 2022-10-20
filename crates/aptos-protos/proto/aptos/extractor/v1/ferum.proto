@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package aptos.ferum.v1;
+
+option go_package = "github.com/ferum-dex/ferum-indexer/types/pb/aptos/ferum/v1;pbferum";
+
+message OrderCreateEvent {
+  OrderID orderID = 1;
+  OrderMetadata orderMetadata = 2;
+  uint64 timestampMicroSeconds = 3;
+}
+
+message OrderFinalizeEvent {
+  OrderID orderID = 1;
+  OrderMetadata orderMetadata = 2;
+  CancelAgent cancelAgent = 3;
+  uint64 timestampMicroSeconds = 4;
+}
+
+message OrderExecutionEvent {
+  OrderID orderID = 1;
+  OrderMetadata orderMetadata = 2;
+
+  OrderID oppositeOrderID = 3;
+  OrderMetadata oppositeOrderMetadata = 4;
+
+  FixedPoint64 price = 5;
+  FixedPoint64 qty = 6;
+
+  uint64 timestampMicroSeconds = 7;
+}
+
+message PriceUpdateEvent {
+  Quote data = 1;
+}
+
+message OrderID {
+  uint64 counter = 1;
+  string owner = 2;
+}
+
+message UserIdentifier {
+  string protocolAddress = 1;
+  string userAddress = 2;
+}
+
+message OrderMetadata {
+  TypeInfo instrumentType = 1;
+  TypeInfo quoteType = 2;
+
+  OrderSide side = 3;
+  FixedPoint64 remainingQty = 4;
+  FixedPoint64 originalQty = 5;
+  FixedPoint64 price = 6;
+  OrderType type = 7;
+  OrderStatus status = 8;
+  string clientOrderID = 9;
+  uint64 executionCounter = 10;
+  uint64 updateCounter = 11;
+  UserIdentifier userIdentifier = 12;
+}
+
+message Quote {
+  TypeInfo instrumentType = 1;
+  TypeInfo quoteType = 2;
+
+  FixedPoint64 maxBid = 3;
+  FixedPoint64 bidSize = 4;
+  FixedPoint64 minAsk = 5;
+  FixedPoint64 askSize = 6;
+  uint64 timestampMicroSeconds = 7;
+}
+
+message TypeInfo {
+  string account_address = 1 [json_name = "account_address"];
+  string module_name = 2 [json_name = "module_name"];
+  string struct_name = 3 [json_name = "struct_name"];
+}
+
+message FixedPoint64 {
+  uint64 val = 1;
+}
+
+enum OrderSide {
+  OrderSideNone = 0;
+  OrderSideSell = 1;
+  OrderSideBuy = 2;
+}
+
+enum OrderType {
+  OrderTypeNone = 0;
+  OrderTypeResting = 1;
+  OrderTypePost = 2;
+  OrderTypeIOC = 3;
+  OrderTypeFOK = 4;
+}
+
+enum OrderStatus {
+  OrderStatusNone = 0;
+  OrderStatusPending = 1;
+  OrderStatusCancelled = 2;
+  OrderStatusFilled = 3;
+}
+
+enum CancelAgent {
+  CancelAgentNone = 0;
+  CancelAgentIOC = 1;
+  CancelAgentFOK = 2;
+  CancelAgentUser = 3;
+  CancelAgentPost = 4;
+}

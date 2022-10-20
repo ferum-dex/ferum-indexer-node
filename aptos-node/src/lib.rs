@@ -17,7 +17,7 @@ use aptos_config::{
     utils::get_genesis_txn,
 };
 use aptos_data_client::aptosnet::AptosNetDataClient;
-use aptos_fh_stream::runtime::bootstrap as bootstrap_fh_stream;
+use aptos_ferum_stream::runtime::bootstrap as bootstrap_fh_stream;
 use aptos_infallible::RwLock;
 use aptos_logger::{prelude::*, telemetry_log_writer::TelemetryLog, Level, LoggerFilterUpdater};
 use aptos_state_view::account_with_state_view::AsAccountWithStateView;
@@ -806,12 +806,7 @@ pub fn setup_environment(
         aptos_db.clone(),
         mp_client_sender.clone(),
     )?;
-    let sf_runtime = match bootstrap_fh_stream(
-        &node_config,
-        chain_id,
-        aptos_db.clone(),
-        mp_client_sender.clone(),
-    ) {
+    let sf_runtime = match bootstrap_fh_stream(&node_config, chain_id, aptos_db.clone()) {
         None => None,
         Some(res) => Some(res?),
     };

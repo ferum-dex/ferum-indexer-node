@@ -1,6 +1,3 @@
-// Copyright (c) Aptos
-// SPDX-License-Identifier: Apache-2.0
-
 // @generated
 impl serde::Serialize for CollectionData {
     #[allow(deprecated)]
@@ -51,10 +48,7 @@ impl serde::Serialize for CollectionData {
             struct_ser.serialize_field("description", &self.description)?;
         }
         if self.transaction_version != 0 {
-            struct_ser.serialize_field(
-                "transactionVersion",
-                ToString::to_string(&self.transaction_version).as_str(),
-            )?;
+            struct_ser.serialize_field("transactionVersion", ToString::to_string(&self.transaction_version).as_str())?;
         }
         if !self.metadata_uri.is_empty() {
             struct_ser.serialize_field("metadataUri", &self.metadata_uri)?;
@@ -119,10 +113,7 @@ impl<'de> serde::Deserialize<'de> for CollectionData {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(
-                        &self,
-                        formatter: &mut std::fmt::Formatter<'_>,
-                    ) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
@@ -158,8 +149,8 @@ impl<'de> serde::Deserialize<'de> for CollectionData {
             }
 
             fn visit_map<V>(self, mut map: V) -> std::result::Result<CollectionData, V::Error>
-            where
-                V: serde::de::MapAccess<'de>,
+                where
+                    V: serde::de::MapAccess<'de>,
             {
                 let mut creator_address__ = None;
                 let mut collection_name__ = None;
@@ -193,13 +184,10 @@ impl<'de> serde::Deserialize<'de> for CollectionData {
                         }
                         GeneratedField::TransactionVersion => {
                             if transaction_version__.is_some() {
-                                return Err(serde::de::Error::duplicate_field(
-                                    "transactionVersion",
-                                ));
+                                return Err(serde::de::Error::duplicate_field("transactionVersion"));
                             }
                             transaction_version__ = Some(
-                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?
-                                    .0,
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
                             );
                         }
                         GeneratedField::MetadataUri => {
@@ -213,8 +201,7 @@ impl<'de> serde::Deserialize<'de> for CollectionData {
                                 return Err(serde::de::Error::duplicate_field("supply"));
                             }
                             supply__ = Some(
-                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?
-                                    .0,
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
                             );
                         }
                         GeneratedField::Maximum => {
@@ -222,8 +209,7 @@ impl<'de> serde::Deserialize<'de> for CollectionData {
                                 return Err(serde::de::Error::duplicate_field("maximum"));
                             }
                             maximum__ = Some(
-                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?
-                                    .0,
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
                             );
                         }
                         GeneratedField::MaximumMutable => {
@@ -240,9 +226,7 @@ impl<'de> serde::Deserialize<'de> for CollectionData {
                         }
                         GeneratedField::DescriptionMutable => {
                             if description_mutable__.is_some() {
-                                return Err(serde::de::Error::duplicate_field(
-                                    "descriptionMutable",
-                                ));
+                                return Err(serde::de::Error::duplicate_field("descriptionMutable"));
                             }
                             description_mutable__ = Some(map.next_value()?);
                         }
@@ -299,10 +283,7 @@ impl serde::Serialize for Token {
             struct_ser.serialize_field("tokenId", v)?;
         }
         if self.transaction_version != 0 {
-            struct_ser.serialize_field(
-                "transactionVersion",
-                ToString::to_string(&self.transaction_version).as_str(),
-            )?;
+            struct_ser.serialize_field("transactionVersion", ToString::to_string(&self.transaction_version).as_str())?;
         }
         if !self.token_properties.is_empty() {
             struct_ser.serialize_field("tokenProperties", &self.token_properties)?;
@@ -358,10 +339,7 @@ impl<'de> serde::Deserialize<'de> for Token {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(
-                        &self,
-                        formatter: &mut std::fmt::Formatter<'_>,
-                    ) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
@@ -394,8 +372,8 @@ impl<'de> serde::Deserialize<'de> for Token {
             }
 
             fn visit_map<V>(self, mut map: V) -> std::result::Result<Token, V::Error>
-            where
-                V: serde::de::MapAccess<'de>,
+                where
+                    V: serde::de::MapAccess<'de>,
             {
                 let mut token_id__ = None;
                 let mut transaction_version__ = None;
@@ -414,13 +392,10 @@ impl<'de> serde::Deserialize<'de> for Token {
                         }
                         GeneratedField::TransactionVersion => {
                             if transaction_version__.is_some() {
-                                return Err(serde::de::Error::duplicate_field(
-                                    "transactionVersion",
-                                ));
+                                return Err(serde::de::Error::duplicate_field("transactionVersion"));
                             }
                             transaction_version__ = Some(
-                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?
-                                    .0,
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
                             );
                         }
                         GeneratedField::TokenProperties => {
@@ -434,8 +409,7 @@ impl<'de> serde::Deserialize<'de> for Token {
                                 return Err(serde::de::Error::duplicate_field("amount"));
                             }
                             amount__ = Some(
-                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?
-                                    .0,
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
                             );
                         }
                         GeneratedField::OwnerAddress => {
@@ -530,10 +504,7 @@ impl serde::Serialize for TokenData {
             struct_ser.serialize_field("tokenDataId", v)?;
         }
         if self.transaction_version != 0 {
-            struct_ser.serialize_field(
-                "transactionVersion",
-                ToString::to_string(&self.transaction_version).as_str(),
-            )?;
+            struct_ser.serialize_field("transactionVersion", ToString::to_string(&self.transaction_version).as_str())?;
         }
         if self.maximum != 0 {
             struct_ser.serialize_field("maximum", ToString::to_string(&self.maximum).as_str())?;
@@ -542,10 +513,7 @@ impl serde::Serialize for TokenData {
             struct_ser.serialize_field("supply", ToString::to_string(&self.supply).as_str())?;
         }
         if self.largest_property_version != 0 {
-            struct_ser.serialize_field(
-                "largestPropertyVersion",
-                ToString::to_string(&self.largest_property_version).as_str(),
-            )?;
+            struct_ser.serialize_field("largestPropertyVersion", ToString::to_string(&self.largest_property_version).as_str())?;
         }
         if !self.metadata_uri.is_empty() {
             struct_ser.serialize_field("metadataUri", &self.metadata_uri)?;
@@ -554,16 +522,10 @@ impl serde::Serialize for TokenData {
             struct_ser.serialize_field("payeeAddress", &self.payee_address)?;
         }
         if self.royalty_points_numerator != 0 {
-            struct_ser.serialize_field(
-                "royaltyPointsNumerator",
-                ToString::to_string(&self.royalty_points_numerator).as_str(),
-            )?;
+            struct_ser.serialize_field("royaltyPointsNumerator", ToString::to_string(&self.royalty_points_numerator).as_str())?;
         }
         if self.royalty_points_denominator != 0 {
-            struct_ser.serialize_field(
-                "royaltyPointsDenominator",
-                ToString::to_string(&self.royalty_points_denominator).as_str(),
-            )?;
+            struct_ser.serialize_field("royaltyPointsDenominator", ToString::to_string(&self.royalty_points_denominator).as_str())?;
         }
         if self.maximum_mutable {
             struct_ser.serialize_field("maximumMutable", &self.maximum_mutable)?;
@@ -638,10 +600,7 @@ impl<'de> serde::Deserialize<'de> for TokenData {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(
-                        &self,
-                        formatter: &mut std::fmt::Formatter<'_>,
-                    ) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
@@ -659,9 +618,7 @@ impl<'de> serde::Deserialize<'de> for TokenData {
                             "metadataUri" => Ok(GeneratedField::MetadataUri),
                             "payeeAddress" => Ok(GeneratedField::PayeeAddress),
                             "royaltyPointsNumerator" => Ok(GeneratedField::RoyaltyPointsNumerator),
-                            "royaltyPointsDenominator" => {
-                                Ok(GeneratedField::RoyaltyPointsDenominator)
-                            }
+                            "royaltyPointsDenominator" => Ok(GeneratedField::RoyaltyPointsDenominator),
                             "maximumMutable" => Ok(GeneratedField::MaximumMutable),
                             "uriMutable" => Ok(GeneratedField::UriMutable),
                             "descriptionMutable" => Ok(GeneratedField::DescriptionMutable),
@@ -684,8 +641,8 @@ impl<'de> serde::Deserialize<'de> for TokenData {
             }
 
             fn visit_map<V>(self, mut map: V) -> std::result::Result<TokenData, V::Error>
-            where
-                V: serde::de::MapAccess<'de>,
+                where
+                    V: serde::de::MapAccess<'de>,
             {
                 let mut token_data_id__ = None;
                 let mut transaction_version__ = None;
@@ -712,13 +669,10 @@ impl<'de> serde::Deserialize<'de> for TokenData {
                         }
                         GeneratedField::TransactionVersion => {
                             if transaction_version__.is_some() {
-                                return Err(serde::de::Error::duplicate_field(
-                                    "transactionVersion",
-                                ));
+                                return Err(serde::de::Error::duplicate_field("transactionVersion"));
                             }
                             transaction_version__ = Some(
-                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?
-                                    .0,
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
                             );
                         }
                         GeneratedField::Maximum => {
@@ -726,8 +680,7 @@ impl<'de> serde::Deserialize<'de> for TokenData {
                                 return Err(serde::de::Error::duplicate_field("maximum"));
                             }
                             maximum__ = Some(
-                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?
-                                    .0,
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
                             );
                         }
                         GeneratedField::Supply => {
@@ -735,19 +688,15 @@ impl<'de> serde::Deserialize<'de> for TokenData {
                                 return Err(serde::de::Error::duplicate_field("supply"));
                             }
                             supply__ = Some(
-                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?
-                                    .0,
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
                             );
                         }
                         GeneratedField::LargestPropertyVersion => {
                             if largest_property_version__.is_some() {
-                                return Err(serde::de::Error::duplicate_field(
-                                    "largestPropertyVersion",
-                                ));
+                                return Err(serde::de::Error::duplicate_field("largestPropertyVersion"));
                             }
                             largest_property_version__ = Some(
-                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?
-                                    .0,
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
                             );
                         }
                         GeneratedField::MetadataUri => {
@@ -764,24 +713,18 @@ impl<'de> serde::Deserialize<'de> for TokenData {
                         }
                         GeneratedField::RoyaltyPointsNumerator => {
                             if royalty_points_numerator__.is_some() {
-                                return Err(serde::de::Error::duplicate_field(
-                                    "royaltyPointsNumerator",
-                                ));
+                                return Err(serde::de::Error::duplicate_field("royaltyPointsNumerator"));
                             }
                             royalty_points_numerator__ = Some(
-                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?
-                                    .0,
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
                             );
                         }
                         GeneratedField::RoyaltyPointsDenominator => {
                             if royalty_points_denominator__.is_some() {
-                                return Err(serde::de::Error::duplicate_field(
-                                    "royaltyPointsDenominator",
-                                ));
+                                return Err(serde::de::Error::duplicate_field("royaltyPointsDenominator"));
                             }
                             royalty_points_denominator__ = Some(
-                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?
-                                    .0,
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
                             );
                         }
                         GeneratedField::MaximumMutable => {
@@ -798,9 +741,7 @@ impl<'de> serde::Deserialize<'de> for TokenData {
                         }
                         GeneratedField::DescriptionMutable => {
                             if description_mutable__.is_some() {
-                                return Err(serde::de::Error::duplicate_field(
-                                    "descriptionMutable",
-                                ));
+                                return Err(serde::de::Error::duplicate_field("descriptionMutable"));
                             }
                             description_mutable__ = Some(map.next_value()?);
                         }
@@ -882,7 +823,11 @@ impl<'de> serde::Deserialize<'de> for TokenDataId {
     where
         D: serde::Deserializer<'de>,
     {
-        const FIELDS: &[&str] = &["creatorAddress", "collectionName", "name"];
+        const FIELDS: &[&str] = &[
+            "creatorAddress",
+            "collectionName",
+            "name",
+        ];
 
         #[allow(clippy::enum_variant_names)]
         enum GeneratedField {
@@ -900,10 +845,7 @@ impl<'de> serde::Deserialize<'de> for TokenDataId {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(
-                        &self,
-                        formatter: &mut std::fmt::Formatter<'_>,
-                    ) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
@@ -932,8 +874,8 @@ impl<'de> serde::Deserialize<'de> for TokenDataId {
             }
 
             fn visit_map<V>(self, mut map: V) -> std::result::Result<TokenDataId, V::Error>
-            where
-                V: serde::de::MapAccess<'de>,
+                where
+                    V: serde::de::MapAccess<'de>,
             {
                 let mut creator_address__ = None;
                 let mut collection_name__ = None;
@@ -989,10 +931,7 @@ impl serde::Serialize for TokenId {
             struct_ser.serialize_field("tokenDataId", v)?;
         }
         if self.property_version != 0 {
-            struct_ser.serialize_field(
-                "propertyVersion",
-                ToString::to_string(&self.property_version).as_str(),
-            )?;
+            struct_ser.serialize_field("propertyVersion", ToString::to_string(&self.property_version).as_str())?;
         }
         struct_ser.end()
     }
@@ -1003,7 +942,10 @@ impl<'de> serde::Deserialize<'de> for TokenId {
     where
         D: serde::Deserializer<'de>,
     {
-        const FIELDS: &[&str] = &["tokenDataId", "propertyVersion"];
+        const FIELDS: &[&str] = &[
+            "tokenDataId",
+            "propertyVersion",
+        ];
 
         #[allow(clippy::enum_variant_names)]
         enum GeneratedField {
@@ -1020,10 +962,7 @@ impl<'de> serde::Deserialize<'de> for TokenId {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(
-                        &self,
-                        formatter: &mut std::fmt::Formatter<'_>,
-                    ) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
@@ -1051,8 +990,8 @@ impl<'de> serde::Deserialize<'de> for TokenId {
             }
 
             fn visit_map<V>(self, mut map: V) -> std::result::Result<TokenId, V::Error>
-            where
-                V: serde::de::MapAccess<'de>,
+                where
+                    V: serde::de::MapAccess<'de>,
             {
                 let mut token_data_id__ = None;
                 let mut property_version__ = None;
@@ -1069,8 +1008,7 @@ impl<'de> serde::Deserialize<'de> for TokenId {
                                 return Err(serde::de::Error::duplicate_field("propertyVersion"));
                             }
                             property_version__ = Some(
-                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?
-                                    .0,
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
                             );
                         }
                     }
@@ -1109,10 +1047,7 @@ impl serde::Serialize for Tokens {
         }
         let mut struct_ser = serializer.serialize_struct("aptos.tokens.v1.Tokens", len)?;
         if self.block_height != 0 {
-            struct_ser.serialize_field(
-                "blockHeight",
-                ToString::to_string(&self.block_height).as_str(),
-            )?;
+            struct_ser.serialize_field("blockHeight", ToString::to_string(&self.block_height).as_str())?;
         }
         if self.chain_id != 0 {
             struct_ser.serialize_field("chainId", &self.chain_id)?;
@@ -1161,10 +1096,7 @@ impl<'de> serde::Deserialize<'de> for Tokens {
                 impl<'de> serde::de::Visitor<'de> for GeneratedVisitor {
                     type Value = GeneratedField;
 
-                    fn expecting(
-                        &self,
-                        formatter: &mut std::fmt::Formatter<'_>,
-                    ) -> std::fmt::Result {
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                         write!(formatter, "expected one of: {:?}", &FIELDS)
                     }
 
@@ -1195,8 +1127,8 @@ impl<'de> serde::Deserialize<'de> for Tokens {
             }
 
             fn visit_map<V>(self, mut map: V) -> std::result::Result<Tokens, V::Error>
-            where
-                V: serde::de::MapAccess<'de>,
+                where
+                    V: serde::de::MapAccess<'de>,
             {
                 let mut block_height__ = None;
                 let mut chain_id__ = None;
@@ -1210,8 +1142,7 @@ impl<'de> serde::Deserialize<'de> for Tokens {
                                 return Err(serde::de::Error::duplicate_field("blockHeight"));
                             }
                             block_height__ = Some(
-                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?
-                                    .0,
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
                             );
                         }
                         GeneratedField::ChainId => {
@@ -1219,8 +1150,7 @@ impl<'de> serde::Deserialize<'de> for Tokens {
                                 return Err(serde::de::Error::duplicate_field("chainId"));
                             }
                             chain_id__ = Some(
-                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?
-                                    .0,
+                                map.next_value::<::pbjson::private::NumberDeserialize<_>>()?.0
                             );
                         }
                         GeneratedField::Tokens => {

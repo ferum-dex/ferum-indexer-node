@@ -73,6 +73,7 @@ members = [
     "crates/short-hex-str",
     "crates/transaction-emitter",
     "crates/transaction-emitter-lib",
+    "ecosystem/ferum-stream",
     "ecosystem/node-checker",
     "ecosystem/node-checker/fn-check-client",
     "execution/db-bootstrapper",
