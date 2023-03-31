@@ -8,8 +8,7 @@ use crate::{
         transaction_processor::TransactionProcessor,
     },
     processors::{
-        coin_processor::CoinTransactionProcessor, default_processor::DefaultTransactionProcessor,
-        stake_processor::StakeTransactionProcessor, token_processor::TokenTransactionProcessor,
+        ferum_processor::FerumTransactionProcessor,
         Processor,
     },
 };
@@ -125,15 +124,11 @@ pub async fn run_forever(config: IndexerConfig, context: Arc<Context>) {
 
     let processor_enum = Processor::from_string(&processor_name);
     let processor: Arc<dyn TransactionProcessor> = match processor_enum {
-        Processor::DefaultProcessor => {
-            Arc::new(DefaultTransactionProcessor::new(conn_pool.clone()))
+        Processor::FerumProcessor => {
+            Arc::new(FerumTransactionProcessor::new(
+                conn_pool.clone()
+            ))
         },
-        Processor::TokenProcessor => Arc::new(TokenTransactionProcessor::new(
-            conn_pool.clone(),
-            config.ans_contract_address,
-        )),
-        Processor::CoinProcessor => Arc::new(CoinTransactionProcessor::new(conn_pool.clone())),
-        Processor::StakeProcessor => Arc::new(StakeTransactionProcessor::new(conn_pool.clone())),
     };
 
     let options =
