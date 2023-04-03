@@ -20,7 +20,6 @@ use async_trait::async_trait;
 use diesel::{pg::upsert::excluded, result::Error, ExpressionMethods, PgConnection};
 use field_count::FieldCount;
 use std::{fmt::Debug};
-use std::fs;
 
 use std::borrow::Borrow;
 use itertools::Itertools;
@@ -46,6 +45,7 @@ fn insert_to_db(
         end_version = end_version,
         "Inserting to db",
     );
+    let events = clean_data_for_db(events, true);
     match conn
         .build_transaction()
         .read_write()
@@ -56,18 +56,7 @@ fn insert_to_db(
             )
         }) {
         Ok(_) => Ok(()),
-        Err(_) => {
-            let events = clean_data_for_db(events, true);
-
-            conn.build_transaction()
-                .read_write()
-                .run::<_, Error, _>(|pg_conn| {
-                    insert_to_db_impl(
-                        pg_conn,
-                        &events,
-                    )
-                })
-        },
+        Err(err) => Err(err),
     }
 }
 
@@ -103,12 +92,11 @@ pub struct FerumTransactionProcessor {
 impl FerumTransactionProcessor {
     pub fn new(
         connection_pool: PgDbPool,
+        config_ferum_addresses: Vec<String>,
     ) -> Self {
-        let ferum_config_json = fs::read_to_string("./crates/indexer/src/config/ferum.json").expect("Unable to read file");
-        let addresses:Vec<String> =  serde_json::from_str(&ferum_config_json).expect("JSON was not well-formatted");
         let mut ferum_addresses:Vec<Address> = vec![];
 
-        for address in &addresses {
+        for address in &config_ferum_addresses {
             ferum_addresses.push((address.as_str()).parse::<Address>().unwrap());
         }
 
@@ -133,8 +121,12 @@ impl FerumTransactionProcessor {
                     _ => false,
                 }
             })
-            .map(|(index, event)| EventModel::from_event(&event, version, transaction_block_height, index as i64)
-            )
+            .map(|(index, event)| {
+                EventModel::from_event(&event,
+                    version,
+                    transaction_block_height,
+                    index as i64)
+            })
             .collect_vec();
     }
 }

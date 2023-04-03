@@ -264,6 +264,24 @@ diesel::table! {
 }
 
 diesel::table! {
+    executions (exec_counter, order_counter, order_owner) {
+        exec_counter -> Int8,
+        order_counter -> Int8,
+        order_owner -> Varchar,
+        price -> Numeric,
+        qty -> Numeric,
+        chain_timestamp_microseconds -> Int8,
+        pagination_id -> Int8,
+    }
+}
+
+diesel::table! {
+    highest_processed_block (block) {
+        block -> Int8,
+    }
+}
+
+diesel::table! {
     indexer_status (db) {
         db -> Varchar,
         is_indexer_up -> Bool,
@@ -311,6 +329,26 @@ diesel::table! {
 }
 
 diesel::table! {
+    orders (counter, owner) {
+        counter -> Int8,
+        owner -> Varchar,
+        instrument_type -> Varchar,
+        quote_type -> Varchar,
+        side -> Varchar,
+        original_qty -> Numeric,
+        price -> Numeric,
+        #[sql_name = "type"]
+        type_ -> Varchar,
+        status -> Varchar,
+        client_order_id -> Varchar,
+        cancel_agent -> Varchar,
+        remaining_qty -> Numeric,
+        update_count -> Int8,
+        pagination_id -> Int8,
+    }
+}
+
+diesel::table! {
     processor_status (processor) {
         processor -> Varchar,
         last_success_version -> Int8,
@@ -338,6 +376,18 @@ diesel::table! {
         should_pass -> Bool,
         transaction_timestamp -> Timestamp,
         inserted_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    quotes (instrument_type, quote_type, chain_timestamp_microseconds) {
+        instrument_type -> Varchar,
+        quote_type -> Varchar,
+        chain_timestamp_microseconds -> Int8,
+        max_Bid -> Numeric,
+        bid_size -> Numeric,
+        min_ask -> Numeric,
+        ask_size -> Numeric,
     }
 }
 
@@ -536,13 +586,17 @@ diesel::allow_tables_to_appear_in_same_query!(
     current_token_pending_claims,
     delegated_staking_activities,
     events,
+    executions,
+    highest_processed_block,
     indexer_status,
     ledger_infos,
     move_modules,
     move_resources,
+    orders,
     processor_status,
     processor_statuses,
     proposal_votes,
+    quotes,
     signatures,
     table_items,
     table_metadatas,

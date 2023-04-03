@@ -109,3 +109,8 @@ aptos-move/aptos-vm-profiling/**/*.txt
 metadata-cache
 /local/
 run_*
+
+# aptos
+fullnode.yaml
+waypoint.txt
+genesis.blob

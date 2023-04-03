@@ -70,6 +70,10 @@ pub struct IndexerConfig {
     /// Which address does the ans contract live at. Only available for token_processor. If null, disable ANS indexing
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ans_contract_address: Option<String>,
+
+    /// List of ferum addresses to index for
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ferum_addresses: Option<Vec<String>>,
 }
 
 impl Debug for IndexerConfig {

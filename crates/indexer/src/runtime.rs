@@ -126,7 +126,8 @@ pub async fn run_forever(config: IndexerConfig, context: Arc<Context>) {
     let processor: Arc<dyn TransactionProcessor> = match processor_enum {
         Processor::FerumProcessor => {
             Arc::new(FerumTransactionProcessor::new(
-                conn_pool.clone()
+                conn_pool.clone(),
+                config.ferum_addresses.unwrap()
             ))
         },
     };
