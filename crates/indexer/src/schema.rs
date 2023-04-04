@@ -270,8 +270,8 @@ diesel::table! {
         order_owner -> Varchar,
         price -> Numeric,
         qty -> Numeric,
+        transaction_version -> Int8,
         chain_timestamp_microseconds -> Int8,
-        pagination_id -> Int8,
     }
 }
 
@@ -344,7 +344,7 @@ diesel::table! {
         cancel_agent -> Varchar,
         remaining_qty -> Numeric,
         update_count -> Int8,
-        pagination_id -> Int8,
+        transaction_version -> Int8,
     }
 }
 
@@ -388,6 +388,7 @@ diesel::table! {
         bid_size -> Numeric,
         min_ask -> Numeric,
         ask_size -> Numeric,
+        transaction_version -> Int8,
     }
 }
 
