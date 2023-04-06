@@ -18,6 +18,9 @@ pub mod models;
 pub mod processors;
 pub mod runtime;
 pub mod schema;
+
+pub mod metrics;
+
 mod util;
 
 /// By default, skips test unless `INDEXER_DATABASE_URL` is set.

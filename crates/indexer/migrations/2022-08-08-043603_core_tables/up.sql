@@ -220,7 +220,7 @@ CREATE TABLE events (
     creation_number,
     sequence_number
   ),
-  CONSTRAINT fk_transaction_versions FOREIGN KEY (transaction_version) REFERENCES transactions (version)
+  -- CONSTRAINT fk_transaction_versions FOREIGN KEY (transaction_version) REFERENCES transactions (version)
 );
 CREATE INDEX ev_addr_type_index ON events (account_address);
 CREATE INDEX ev_insat_index ON events (inserted_at);
